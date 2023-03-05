@@ -1,6 +1,5 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
-import galleryReducer from '../features/gallery/gallerySlice';
+import appReducer from './appSlice';
 import {
   persistStore, 
   persistReducer, 
@@ -18,13 +17,10 @@ const persistConfig = {
   storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, galleryReducer);
+const persistedReducer = persistReducer(persistConfig, appReducer);
 
 export const store = configureStore({
-  reducer: {
-    counter: counterReducer,
-    persisted: persistedReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
