@@ -1,9 +1,11 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Card, Image, Tooltip } from "antd";
-import { useEffect, useMemo } from "react";
+import { Card, Checkbox, Image, Tooltip } from "antd";
+import { useCallback, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useAppSelector } from "../../app/hooks";
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import styled from "styled-components";
+import { setFavorites } from "../../app/appSlice";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
 
 type UrlParams = {
   id: string;
@@ -15,14 +17,40 @@ type Props = {
 
 export default function Galleriy({ setPageTitle }: Props): JSX.Element {
   const { id } = useParams<UrlParams>();
+  const dispatch = useAppDispatch();
   const allImages = useAppSelector((state) => state.gallery.photos);
+  const favouriteIds = useAppSelector((state) => state.parsisted.favorites);
 
   const galleryImages = useMemo(() => {
-    if (!id) return [];
+    if (id === undefined) return [];
+
+    if (id === "0") {
+      // show favourites
+      return allImages.filter((image) => favouriteIds.includes(image.id));
+    }
 
     const albumId = parseInt(id);
     return allImages.filter((image) => image.albumId === albumId);
-  }, [allImages]);
+  }, [allImages, id, favouriteIds]);
+
+  const isImageFavourite = useCallback(
+    (imageId: number) => favouriteIds.includes(imageId),
+    [favouriteIds]
+  );
+
+  const updateFavorite = (imageId: number, e: CheckboxChangeEvent) => {
+    const updatedFavIds = [...favouriteIds];
+    const index = updatedFavIds.findIndex((favId) => favId === imageId);
+    const checked = e.target.checked;
+
+    if (checked) {
+      if (index === -1) updatedFavIds.push(imageId);
+    } else {
+      if (index !== -1) updatedFavIds.splice(index, 1);
+    }
+
+    dispatch(setFavorites(updatedFavIds));
+  };
 
   useEffect(() => {
     setPageTitle(
@@ -30,16 +58,33 @@ export default function Galleriy({ setPageTitle }: Props): JSX.Element {
         <Link to="/">
           <ArrowLeftOutlined style={{ color: "white" }} />
         </Link>{" "}
-        Gallery {id}
+        {id !== "0" ? `Gallery ${id}` : "Favourite images"}
       </>
     );
   }, []);
 
-  return (
+  return galleryImages.length ? (
     <GalleryContainer className="gallery">
-      {galleryImages.map((image) => (
-        <Tooltip title={image.title} placement="right">
-          <Card title={image.title} bordered={false} hoverable>
+      {galleryImages.map((image, i) => (
+        <Tooltip key={i} title={image.title} placement="right">
+          <Card
+            title={image.title}
+            bordered={false}
+            hoverable
+            extra={
+              <div
+                title={
+                  (!isImageFavourite(image.id) ? "Add to" : "Remove from") +
+                  " favourites"
+                }
+              >
+                <Checkbox
+                  checked={isImageFavourite(image.id)}
+                  onChange={(e) => updateFavorite(image.id, e)}
+                />
+              </div>
+            }
+          >
             <Image
               src={image.thumbnailUrl}
               preview={{ src: image.url }}
@@ -49,6 +94,8 @@ export default function Galleriy({ setPageTitle }: Props): JSX.Element {
         </Tooltip>
       ))}
     </GalleryContainer>
+  ) : (
+    <>No favourite images.</>
   );
 }
 
