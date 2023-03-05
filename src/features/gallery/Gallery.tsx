@@ -1,9 +1,11 @@
 import React from 'react';
 
-
-export default function Galleriy(): JSX.Element {
+type Props = {
+    setPageTitle: (title: string) => void;
+  }
+export default function Galleriy({setPageTitle}: Props): JSX.Element {
     
     return (
-        <></>
+        <>Gallery</>
     );
 }

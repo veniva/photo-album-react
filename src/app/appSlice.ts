@@ -3,11 +3,11 @@ import { fetchPhotos } from "../appApi";
 import { AppThunk } from "./store";
 
 export interface AppState {
-  photos: Photo[];
+  favorites: number[];
 }
 
 const initialState: AppState = {
-  photos: [],
+  favorites: [],
 };
 
 export const appSlice = createSlice({
@@ -18,28 +18,12 @@ export const appSlice = createSlice({
     reset: (state: Draft<AppState>, action: PayloadAction<AppState>) => {
       state = initialState;
     },
-    setPhotos: (state: Draft<AppState>, action: PayloadAction<Photo[]>) => {
-      state.photos = action.payload;
-    }
+    setFavorites: (state: Draft<AppState>, action: PayloadAction<number[]>) => {
+      state.favorites = action.payload;
+    },
   },
 });
 
 export default appSlice.reducer;
 
-export const { reset, setPhotos } = appSlice.actions;
-
-export function fetchDataThunk(): AppThunk {
-  return (dispatch) => {
-    fetchPhotos().then(data => {
-      dispatch(setPhotos(data))
-    });
-  };
-}
-
-export type Photo = {
-  albumId: number;
-  id: number;
-  title: string;
-  url: string;
-  thumbnailUrl: string;
-};
+export const { reset, setFavorites } = appSlice.actions;
