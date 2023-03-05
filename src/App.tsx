@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from './app/hooks';
+import { useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useAppDispatch } from './app/hooks';
 import Galleries from "./features/gallery/Galleries";
-import { fetchDataThunk } from "./features/gallery/gallerySlice";
 import Gallery from "./features/gallery/Gallery";
+import { fetchDataThunk } from "./features/gallery/gallerySlice";
+import "./App.css";
 
 function App() {
   const dispatch = useAppDispatch();
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string|JSX.Element>("");
 
   useEffect(() => {
     dispatch(fetchDataThunk());
@@ -16,20 +16,22 @@ function App() {
   
   return (
     <div className="App">
-      <header>
-        {title}
-      </header>
-      <section>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Galleries setPageTitle={setTitle} />} />
-            <Route path="/gallery/:id" element={<Gallery setPageTitle={setTitle} />} />
-          </Routes>
-        </BrowserRouter>
-      </section>
-      <footer>
-        © {new Date().getFullYear()}
-      </footer>
+      <BrowserRouter>
+        <header>
+          {title}
+        </header>
+        <section>
+          
+            <Routes>
+              <Route path="/" element={<Galleries setPageTitle={setTitle} />} />
+              <Route path="/gallery/:id" element={<Gallery setPageTitle={setTitle} />} />
+            </Routes>
+          
+        </section>
+        <footer>
+          © {new Date().getFullYear()}
+        </footer>
+      </BrowserRouter>
     </div>
   );
 }
