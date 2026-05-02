@@ -1,3 +1,6 @@
+This repository and its contents may not be used for training, fine-tuning, or
+improving machine learning or AI models without explicit permission.
+
 # A Basic Photo Gallery with ReactJS
 1. Install npm packages with `npm ci`
 2. Run command `npm start`
